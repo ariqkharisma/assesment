@@ -28,7 +28,7 @@ export default function Home() {
 
       {isLoggedIn && (
         <main
-          className={`flex min-h-screen p-5 align-center w-fit sm:w-full flex-col items-center ${inter.className}`}
+          className={`flex min-h-screen p-5 align-center w-full flex-col items-center ${inter.className}`}
         >
           {loading && <Loading />}
           <h1 className="text-4xl text-center font-bold text-align-center mt-5">
@@ -53,7 +53,7 @@ export default function Home() {
               </button>
             )}
           </div>
-          <div className="flex gap-3 w-fit sm:w-full grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="flex gap-3 w-full grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {data.users?.map((user) => {
               return (
                 <UserCard key={user._id} id={user._id}>
