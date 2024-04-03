@@ -7,14 +7,22 @@ import { useRouter } from "next/router";
 function UserDetail() {
   const router = useRouter();
   const userId = router.query.id;
+  const { isLoggedIn, fetchData, refreshState, loading } = useGlobalContext();
+  const [dataUser, setDataUser] = React.useState({});
 
-  const { isLoggedIn, fetchData, data, refreshState, loading } =
-    useGlobalContext();
+  const getDataUser = async () => {
+    try {
+      const response = await fetchData(`/api/users/${userId}`);
+      setDataUser(response?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   React.useEffect(() => {
     refreshState();
     !isLoggedIn && router.push("/login");
-    isLoggedIn && fetchData(`/api/users/${userId}`, "user");
+    isLoggedIn && getDataUser();
   }, [isLoggedIn]);
 
   return (
@@ -25,7 +33,7 @@ function UserDetail() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {isLoggedIn && data.user && (
+      {isLoggedIn && (
         <>
           {loading && <Loading />}
           <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -37,36 +45,36 @@ function UserDetail() {
                 <div>
                   <h2>First Name</h2>
                   <p className="text-xl font-semibold">
-                    {data?.user?.first_name || "-"}
+                    {dataUser.first_name || "-"}
                   </p>
                 </div>
                 <div>
                   <h2>Last Name</h2>
                   <p className="text-xl font-semibold">
-                    {data?.user?.last_name || "-"}
+                    {dataUser.last_name || "-"}
                   </p>
                 </div>
                 <div>
                   <h2>Username</h2>
                   <p className="text-xl font-semibold">
-                    {data?.user?.username || "-"}
+                    {dataUser.username || "-"}
                   </p>
                 </div>
                 <div>
                   <h2>Email</h2>
                   <p className="text-xl font-semibold">
-                    {data?.user?.email || "-"}
+                    {dataUser.email || "-"}
                   </p>
                 </div>
                 <div>
                   <h2>Role</h2>
-                  {data?.user?.role === "admin" ? (
+                  {dataUser.role === "admin" ? (
                     <p className="text-xl bg-purple-200 mt-1 w-fit px-3 py-1 rounded">
-                      {data?.user?.role}
+                      {dataUser.role}
                     </p>
                   ) : (
                     <p className="text-xl bg-red-200 mt-1 w-fit px-3 py-1 rounded">
-                      {data?.user?.role}
+                      {dataUser.role}
                     </p>
                   )}
                 </div>

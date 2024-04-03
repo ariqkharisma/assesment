@@ -5,18 +5,52 @@ import UserCard from "@/components/UserCard";
 import Loading from "@/components/Loading";
 import useGlobalContext from "@/provider/Provider";
 import Head from "next/head";
+import Pagination from "@/components/Pagination";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { loading, isLoggedIn, userInfo, logout, fetchData, data } =
+  const { loading, isLoggedIn, userInfo, logout, fetchData } =
     useGlobalContext();
   const router = useRouter();
+  const [dataUsers, setDataUsers] = React.useState([]);
+
+  // for search
+  const [search, setSearch] = React.useState("");
+
+  // for pagination
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPage, setTotalPage] = React.useState();
+  const [pageSize, setPageSize] = React.useState(5);
+
+  const getDataUsers = async (currentPage, pageSize, search) => {
+    try {
+      const response = await fetchData(
+        search
+          ? `/api/users?page=${currentPage}&limit=${pageSize}&search=${search}`
+          : `/api/users?page=${currentPage}&limit=${pageSize}`
+      );
+      setDataUsers(response?.data);
+      setTotalPage(response?.totalPage);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    currentPage === 1 && getDataUsers(currentPage, pageSize, search);
+    setCurrentPage(1);
+  };
 
   React.useEffect(() => {
     !isLoggedIn && router.push("/login");
-    isLoggedIn && fetchData("./api/users", "users");
+    isLoggedIn && getDataUsers(currentPage, pageSize, search);
   }, [isLoggedIn]);
+
+  React.useEffect(() => {
+    getDataUsers(currentPage, pageSize, search);
+  }, [currentPage, pageSize]);
 
   return (
     <>
@@ -34,6 +68,13 @@ export default function Home() {
           <h1 className="text-4xl text-center font-bold text-align-center mt-5">
             Welcome, {userInfo?.username ? userInfo.username : "User"}!
           </h1>
+          <form onSubmit={handleSearch}>
+            <input
+              placeholder="Search...."
+              className="p-2 mt-4 rounded-md"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </form>
           <button
             onClick={logout}
             className="button bg-red-400 hover:bg-red-500 py-3 px-4 rounded-lg my-5 text-white"
@@ -54,28 +95,43 @@ export default function Home() {
             )}
           </div>
           <div className="flex gap-3 w-full grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {data.users?.map((user) => {
-              return (
-                <UserCard key={user._id} id={user._id}>
-                  <div className="flex flex-col items-start justify-between m-5">
-                    <p className="text-2xl truncate w-[90%]">
-                      {user.first_name} {user.last_name}
-                    </p>
-                    <p className="text-md mt-1 mb-2">{user.email}</p>
-                    {user.role === "admin" ? (
-                      <p className="text-md bg-purple-200 w-fit px-2 rounded">
-                        {user.role}
+            {dataUsers.length > 0 ? (
+              dataUsers?.map((user) => {
+                return (
+                  <UserCard key={user._id} id={user._id}>
+                    <div className="flex flex-col items-start justify-between m-5">
+                      <p className="text-2xl truncate w-[90%]">
+                        {user.first_name} {user.last_name}
                       </p>
-                    ) : (
-                      <p className="text-md bg-red-200 w-fit px-2 rounded">
-                        {user.role}
-                      </p>
-                    )}
-                  </div>
-                </UserCard>
-              );
-            })}
+                      <p className="text-md mt-1 mb-2">{user.email}</p>
+                      {user.role === "admin" ? (
+                        <p className="text-md bg-purple-200 w-fit px-2 rounded">
+                          {user.role}
+                        </p>
+                      ) : (
+                        <p className="text-md bg-red-200 w-fit px-2 rounded">
+                          {user.role}
+                        </p>
+                      )}
+                    </div>
+                  </UserCard>
+                );
+              })
+            ) : (
+              <p className="text-lg">No Data found</p>
+            )}
           </div>
+
+          {userInfo?.role === "admin" && (
+            <Pagination
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              totalPage={totalPage}
+              setTotalPage={setTotalPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
         </main>
       )}
     </>

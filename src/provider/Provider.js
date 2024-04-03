@@ -22,8 +22,8 @@ export function Provider({ children }) {
     return { type: "REQUESTING" };
   };
 
-  const requestSuccess = (data) => {
-    return { type: "REQUEST_SUCCESS", payload: data };
+  const requestSuccess = () => {
+    return { type: "REQUEST_SUCCESS" };
   };
 
   const authSuccess = (data) => {
@@ -55,7 +55,7 @@ export function Provider({ children }) {
     dispatch(requesting());
     try {
       const { data } = await axios.post("/api/auth/register", requestBody);
-      dispatch(requestSuccess({}));
+      dispatch(requestSuccess());
       toast.success("Register Success");
     } catch (error) {
       console.log(error);
@@ -70,7 +70,7 @@ export function Provider({ children }) {
     toast.success("Logout Success");
   };
 
-  const fetchData = async (apiURL, dataId) => {
+  const fetchData = async (apiURL) => {
     dispatch(requesting());
     try {
       const { data } = await axios.get(apiURL, {
@@ -78,10 +78,12 @@ export function Provider({ children }) {
           Authorization: state.token ? `Bearer ${state.token}` : null,
         },
       });
-      dispatch(requestSuccess({ [dataId]: data.data }));
+      dispatch(requestSuccess());
+      return data;
     } catch (error) {
       console.log(error);
       dispatch(requestFailure(error.response?.data.message));
+      toast.error("Fetch Data Failed: ", error.response?.data.message);
     }
   };
 
@@ -93,10 +95,13 @@ export function Provider({ children }) {
           Authorization: state.token ? `Bearer ${state.token}` : null,
         },
       });
-      dispatch(requestSuccess(data.data));
+      dispatch(requestSuccess());
+      toast.success("Create Success");
+      return data.data
     } catch (error) {
       console.log(error);
       dispatch(requestFailure(error.response?.data.message));
+      toast.error("Create Failed: ", error.response?.data.message);
     }
   };
 
@@ -108,12 +113,12 @@ export function Provider({ children }) {
           Authorization: state.token ? `Bearer ${state.token}` : null,
         },
       });
-      dispatch(requestSuccess({}));
+      dispatch(requestSuccess());
       toast.success("Update Success");
     } catch (error) {
       console.log(error);
       dispatch(requestFailure(error.response?.data.message));
-      toast.error(error.response?.data.message);
+      toast.error("Update Failed: ", error.response?.data.message);
     }
   };
 
@@ -125,7 +130,7 @@ export function Provider({ children }) {
           Authorization: state.token ? `Bearer ${state.token}` : null,
         },
       });
-      dispatch(requestSuccess({}));
+      dispatch(requestSuccess());
       toast.success("Delete Success");
     } catch (error) {
       console.log(error);

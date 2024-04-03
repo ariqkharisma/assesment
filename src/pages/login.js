@@ -39,7 +39,7 @@ function LoginPage() {
             >
               Login
             </h1>
-            <form className="p-2 flex flex-col container max-w-screen-sm">
+            <form className="flex flex-col container max-w-screen-sm">
               <div className="grid grid-rows-2 gap-4">
                 <input
                   className="px-2 py-3 border-2 rounded-lg border-blue-100"

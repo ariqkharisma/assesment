@@ -10,7 +10,6 @@ function Reducer(state, action) {
       return {
         ...state,
         loading: false,
-        data: { ...state.data, ...action.payload },
         error: "",
       };
     case "AUTH_SUCCESS":
