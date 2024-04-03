@@ -49,7 +49,7 @@ export default function Home() {
   }, [isLoggedIn]);
 
   React.useEffect(() => {
-    getDataUsers(currentPage, pageSize, search);
+    isLoggedIn && getDataUsers(currentPage, pageSize, search);
   }, [currentPage, pageSize]);
 
   return (

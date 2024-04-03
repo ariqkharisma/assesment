@@ -13,7 +13,6 @@ function UserCard(props) {
     if (window.confirm("Are you sure want to delete this user?"))
       try {
         await deleteData(`./api/users/${key}`);
-        await fetchData("./api/users", "users");
       } catch (error) {
         console.log(error);
       }
