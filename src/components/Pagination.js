@@ -8,11 +8,6 @@ function Pagination({
   totalPage,
   setTotalPage,
 }) {
-  React.useEffect(() => {
-    console.log("pageSize: ", pageSize);
-    console.log("totalPage: ", totalPage);
-    console.log("currentPage: ", currentPage);
-  }, [totalPage, currentPage, pageSize]);
 
   return (
     <div className="flex items-center justify-between w-full mt-10">
